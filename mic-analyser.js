@@ -22,7 +22,6 @@ button.onclick = async () => {
 
   // Wire graph
   source.connect(analyser);
-  // ⚠️ Do NOT connect analyser to destination (prevents feedback)
 
   draw();
 };
@@ -34,9 +33,22 @@ function draw() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const barWidth = canvas.width / dataArray.length;
+  // Calculate which bins correspond to 400-800Hz
+  const sampleRate = audioCtx.sampleRate;
+  const fftSize = analyser.fftSize;
+  
+  const minFreq = 400;
+  const maxFreq = 800;
+  
+  const minBin = Math.floor((minFreq * fftSize) / sampleRate);
+  const maxBin = Math.ceil((maxFreq * fftSize) / sampleRate);
+  
+  // Only draw the bins in our frequency range
+  const binCount = maxBin - minBin;
+  const barWidth = canvas.width / binCount;
 
-  dataArray.forEach((value, i) => {
+  for (let i = 0; i < binCount; i++) {
+    const value = dataArray[minBin + i];
     const barHeight = value;
     ctx.fillRect(
       i * barWidth,
@@ -44,5 +56,5 @@ function draw() {
       barWidth,
       barHeight
     );
-  });
+  }
 }
