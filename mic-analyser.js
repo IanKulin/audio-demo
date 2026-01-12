@@ -15,11 +15,15 @@ const thresholdDisplaySpan = document.getElementById("threshold-display");
 const accordionHeader = document.getElementById("accordion-header");
 const accordionIcon = document.getElementById("accordion-icon");
 const controls = document.getElementById("controls");
+const characterDisplay = document.getElementById("character-display");
+const patternCanvas = document.getElementById("pattern-canvas");
+const canvasCtx = patternCanvas ? patternCanvas.getContext("2d") : null;
 
 let audioCtx, analyser, dataArray;
 let currentState = undefined; // undefined, "tone", or "no-tone"
 let currentStateStartTime = null;
 let stateHistory = []; // Array to store last 10 state periods
+let characterHistory = []; // Array to store captured character patterns
 const MAX_HISTORY = 10;
 
 // Accordion functionality
@@ -156,6 +160,84 @@ function updateHistoryDisplay() {
   }
 }
 
+function processCharacter() {
+  if (stateHistory.length === 0) return;
+  
+  // Create a copy of the current state history for this character
+  const characterPattern = [...stateHistory];
+  
+  // Clear the canvas
+  if (canvasCtx) {
+    canvasCtx.clearRect(0, 0, patternCanvas.width, patternCanvas.height);
+    
+    // Draw the pattern
+    let xPosition = 10;
+    const yCenter = patternCanvas.height / 2;
+    const barHeight = 60;
+    const pixelsPerMs = 0.5; // Scale factor for time to pixels
+    
+    for (const state of characterPattern) {
+      const duration = state.endTime - state.startTime;
+      const width = duration * pixelsPerMs;
+      
+      if (state.state === 'tone') {
+        // Draw filled rectangle for tone
+        canvasCtx.fillStyle = '#4caf50';
+        canvasCtx.fillRect(xPosition, yCenter - barHeight/2, width, barHeight);
+        
+        // Draw border
+        canvasCtx.strokeStyle = '#2e7d32';
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeRect(xPosition, yCenter - barHeight/2, width, barHeight);
+        
+        xPosition += width;
+      } else {
+        // Just move position for no-tone (blank space)
+        xPosition += width;
+      }
+    }
+    
+    // Draw timeline markers
+    canvasCtx.fillStyle = '#666';
+    canvasCtx.font = '10px monospace';
+    
+    // Calculate total duration
+    let totalDuration = 0;
+    for (const state of characterPattern) {
+      totalDuration += state.endTime - state.startTime;
+    }
+    canvasCtx.fillText(`Total: ${totalDuration.toFixed(0)} ms`, 10, patternCanvas.height - 10);
+  }
+  
+  // Generate text representation
+  let visual = '';
+  for (const state of characterPattern) {
+    const duration = state.endTime - state.startTime;
+    
+    if (state.state === 'tone') {
+      // Represent tones with '█' (proportional to duration)
+      const blocks = Math.max(1, Math.round(duration / 50)); // Each block = ~50ms
+      visual += '█'.repeat(blocks);
+    } else {
+      // Represent no-tone with spaces
+      const spaces = Math.max(1, Math.round(duration / 50));
+      visual += ' '.repeat(spaces);
+    }
+  }
+  
+  // Add to character display
+  if (characterDisplay) {
+    if (characterDisplay.textContent === 'Waiting for character...') {
+      characterDisplay.textContent = '';
+    }
+    characterDisplay.textContent += visual + ' | ';
+  }
+  
+  // Clear state history for next character
+  stateHistory = [];
+  updateHistoryDisplay();
+}
+
 function draw() {
   requestAnimationFrame(draw);
 
@@ -185,9 +267,20 @@ function draw() {
   // Check if amplitude exceeds threshold
   const newState = avgAmplitude > threshold ? "tone" : "no-tone";
   
+  // Check if current no-tone exceeds character space length
+  const now = Date.now();
+  if (currentState === "no-tone" && currentStateStartTime !== null && charSpaceLength > 0) {
+    const currentDuration = now - currentStateStartTime;
+    if (currentDuration >= charSpaceLength) {
+      // Process the character
+      processCharacter();
+      // Reset the timer
+      currentStateStartTime = now;
+    }
+  }
+  
   // Detect state change
   if (newState !== currentState) {
-    const now = Date.now();
     
     // If we had a previous state, record it in history
     if (currentState !== undefined && currentStateStartTime !== null) {
