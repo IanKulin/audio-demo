@@ -6,6 +6,8 @@ const minFreqSlider = document.getElementById("minFreq");
 const minFreqValue = document.getElementById("minFreq-value");
 const maxFreqSlider = document.getElementById("maxFreq");
 const maxFreqValue = document.getElementById("maxFreq-value");
+const charSpaceLengthSlider = document.getElementById("charSpaceLength");
+const charSpaceLengthValue = document.getElementById("charSpaceLength-value");
 const meterBar = document.getElementById("meter-bar");
 const thresholdLine = document.getElementById("threshold-line");
 const currentLevelSpan = document.getElementById("current-level");
@@ -40,6 +42,7 @@ accordionHeader.addEventListener('click', toggleAccordion);
 let threshold = localStorage.getItem('micThreshold') ? parseInt(localStorage.getItem('micThreshold')) : 50;
 let minFreq = localStorage.getItem('micMinFreq') ? parseInt(localStorage.getItem('micMinFreq')) : 400;
 let maxFreq = localStorage.getItem('micMaxFreq') ? parseInt(localStorage.getItem('micMaxFreq')) : 800;
+let charSpaceLength = localStorage.getItem('micCharSpaceLength') ? parseInt(localStorage.getItem('micCharSpaceLength')) : 0;
 
 // Set initial slider values
 thresholdSlider.value = threshold;
@@ -51,6 +54,9 @@ minFreqValue.textContent = minFreq;
 
 maxFreqSlider.value = maxFreq;
 maxFreqValue.textContent = maxFreq;
+
+charSpaceLengthSlider.value = charSpaceLength;
+charSpaceLengthValue.textContent = charSpaceLength;
 
 // Update threshold line position
 function updateThresholdLine() {
@@ -97,6 +103,13 @@ maxFreqSlider.oninput = () => {
     minFreqValue.textContent = minFreq;
     localStorage.setItem('micMinFreq', minFreq);
   }
+};
+
+// Update charSpaceLength when slider changes
+charSpaceLengthSlider.oninput = () => {
+  charSpaceLength = parseInt(charSpaceLengthSlider.value);
+  charSpaceLengthValue.textContent = charSpaceLength;
+  localStorage.setItem('micCharSpaceLength', charSpaceLength);
 };
 
 button.onclick = async () => {
