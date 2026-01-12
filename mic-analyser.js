@@ -2,6 +2,10 @@ const button = document.getElementById("start");
 const statusDiv = document.getElementById("status");
 const thresholdSlider = document.getElementById("threshold");
 const thresholdValue = document.getElementById("threshold-value");
+const meterBar = document.getElementById("meter-bar");
+const thresholdLine = document.getElementById("threshold-line");
+const currentLevelSpan = document.getElementById("current-level");
+const thresholdDisplaySpan = document.getElementById("threshold-display");
 
 let audioCtx, analyser, dataArray;
 
@@ -9,11 +13,21 @@ let audioCtx, analyser, dataArray;
 let threshold = localStorage.getItem('micThreshold') ? parseInt(localStorage.getItem('micThreshold')) : 50;
 thresholdSlider.value = threshold;
 thresholdValue.textContent = threshold;
+thresholdDisplaySpan.textContent = threshold;
+
+// Update threshold line position
+function updateThresholdLine() {
+  const percentage = (threshold / 255) * 100;
+  thresholdLine.style.left = percentage + '%';
+}
+updateThresholdLine();
 
 // Update threshold display when slider changes
 thresholdSlider.oninput = () => {
   threshold = parseInt(thresholdSlider.value);
   thresholdValue.textContent = threshold;
+  thresholdDisplaySpan.textContent = threshold;
+  updateThresholdLine();
   localStorage.setItem('micThreshold', threshold);
 };
 
@@ -65,6 +79,11 @@ function draw() {
     count++;
   }
   const avgAmplitude = count > 0 ? sum / count : 0;
+  
+  // Update level meter
+  const percentage = (avgAmplitude / 255) * 100;
+  meterBar.style.width = percentage + '%';
+  currentLevelSpan.textContent = Math.round(avgAmplitude);
   
   // Check if amplitude exceeds threshold
   if (avgAmplitude > threshold) {

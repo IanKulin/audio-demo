@@ -29,6 +29,47 @@
         display: block;
         margin-bottom: 10px;
       }
+      .level-meter {
+        margin: 20px 0;
+      }
+      .meter-container {
+        width: 100%;
+        max-width: 500px;
+        height: 60px;
+        background: #f0f0f0;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+      .meter-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4CAF50, #FFC107, #F44336);
+        width: 0%;
+        transition: width 0.05s ease-out;
+      }
+      .threshold-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #000;
+        z-index: 10;
+      }
+      .threshold-line::before {
+        content: '▼';
+        position: absolute;
+        top: -20px;
+        left: -6px;
+        font-size: 16px;
+        color: #000;
+      }
+      .level-value {
+        text-align: center;
+        margin-top: 5px;
+        font-family: monospace;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -39,6 +80,16 @@
         Threshold: <span id="threshold-value">50</span>
       </label>
       <input type="range" id="threshold" min="0" max="255" value="50">
+    </div>
+
+    <div class="level-meter">
+      <div class="meter-container">
+        <div class="meter-bar" id="meter-bar"></div>
+        <div class="threshold-line" id="threshold-line"></div>
+      </div>
+      <div class="level-value">
+        Current Level: <span id="current-level">0</span> / Threshold: <span id="threshold-display">50</span>
+      </div>
     </div>
 
     <div id="status">Click "Start mic" to begin</div>
