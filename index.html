@@ -53,7 +53,7 @@
       }
       .meter-bar {
         height: 100%;
-        background: linear-gradient(90deg, #4CAF50, #FFC107, #F44336);
+        background: #bdc0bd;
         width: 0%;
         transition: width 0.05s ease-out;
       }
@@ -78,6 +78,35 @@
         margin-top: 5px;
         font-family: monospace;
         font-size: 14px;
+      }
+      .history-section {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+      }
+      .history-section h3 {
+        margin-top: 0;
+      }
+      #history-list {
+        list-style: none;
+        padding: 0;
+        font-family: monospace;
+      }
+      #history-list li {
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 4px;
+        border-left: 4px solid #ccc;
+      }
+      #history-list li.tone {
+        background: #e8f5e9;
+        border-left-color: #4caf50;
+      }
+      #history-list li.no-tone {
+        background: #ffebee;
+        border-left-color: #f44336;
       }
     </style>
   </head>
@@ -118,6 +147,13 @@
     </div>
 
     <div id="status">Click "Start mic" to begin</div>
+
+    <div class="history-section">
+      <h3>State History (Last 10)</h3>
+      <ul id="history-list">
+        <li>No history yet</li>
+      </ul>
+    </div>
 
     <script src="mic-analyser.js"></script>
   </body>

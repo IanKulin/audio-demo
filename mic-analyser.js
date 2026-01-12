@@ -12,6 +12,10 @@ const currentLevelSpan = document.getElementById("current-level");
 const thresholdDisplaySpan = document.getElementById("threshold-display");
 
 let audioCtx, analyser, dataArray;
+let currentState = undefined; // undefined, "tone", or "no-tone"
+let currentStateStartTime = null;
+let stateHistory = []; // Array to store last 10 state periods
+const MAX_HISTORY = 10;
 
 // Load settings from localStorage or use defaults
 let threshold = localStorage.getItem('micThreshold') ? parseInt(localStorage.getItem('micThreshold')) : 50;
@@ -101,6 +105,25 @@ button.onclick = async () => {
   draw();
 };
 
+function updateHistoryDisplay() {
+  const historyList = document.getElementById('history-list');
+  if (!historyList) return;
+  
+  // Clear current display
+  historyList.innerHTML = '';
+  
+  // Display history in reverse order (newest first)
+  for (let i = stateHistory.length - 1; i >= 0; i--) {
+    const entry = stateHistory[i];
+    const duration = ((entry.endTime - entry.startTime) / 1000).toFixed(2);
+    
+    const li = document.createElement('li');
+    li.textContent = `${entry.state}: ${duration}s`;
+    li.className = entry.state;
+    historyList.appendChild(li);
+  }
+}
+
 function draw() {
   requestAnimationFrame(draw);
 
@@ -128,6 +151,38 @@ function draw() {
   currentLevelSpan.textContent = Math.round(avgAmplitude);
   
   // Check if amplitude exceeds threshold
+  const newState = avgAmplitude > threshold ? "tone" : "no-tone";
+  
+  // Detect state change
+  if (newState !== currentState) {
+    const now = Date.now();
+    
+    // If we had a previous state, record it in history
+    if (currentState !== undefined && currentStateStartTime !== null) {
+      const historyEntry = {
+        state: currentState,
+        startTime: currentStateStartTime,
+        endTime: now
+      };
+      
+      // Add to history
+      stateHistory.push(historyEntry);
+      
+      // Keep only last 10 entries (FIFO)
+      if (stateHistory.length > MAX_HISTORY) {
+        stateHistory.shift();
+      }
+      
+      // Update display
+      updateHistoryDisplay();
+    }
+    
+    // Update current state
+    currentState = newState;
+    currentStateStartTime = now;
+  }
+  
+  // Update status display
   if (avgAmplitude > threshold) {
     statusDiv.textContent = "Tone";
     statusDiv.style.backgroundColor = "#90EE90";
