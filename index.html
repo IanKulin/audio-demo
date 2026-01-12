@@ -19,15 +19,23 @@
         align-items: center;
         justify-content: center;
       }
-      .threshold-control {
+      .controls {
         margin: 20px 0;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #ddd;
       }
-      #threshold {
+      .control-group {
+        margin: 15px 0;
+      }
+      input[type="range"] {
         width: 300px;
       }
       label {
         display: block;
         margin-bottom: 10px;
+        font-weight: bold;
       }
       .level-meter {
         margin: 20px 0;
@@ -75,11 +83,27 @@
   <body>
     <button id="start">Start mic</button>
     
-    <div class="threshold-control">
-      <label for="threshold">
-        Threshold: <span id="threshold-value">50</span>
-      </label>
-      <input type="range" id="threshold" min="0" max="255" value="50">
+    <div class="controls">
+      <div class="control-group">
+        <label for="minFreq">
+          Low Frequency Cutoff: <span id="minFreq-value">400</span> Hz
+        </label>
+        <input type="range" id="minFreq" min="50" max="2000" value="400" step="10">
+      </div>
+      
+      <div class="control-group">
+        <label for="maxFreq">
+          High Frequency Cutoff: <span id="maxFreq-value">800</span> Hz
+        </label>
+        <input type="range" id="maxFreq" min="50" max="2000" value="800" step="10">
+      </div>
+      
+      <div class="control-group">
+        <label for="threshold">
+          Threshold: <span id="threshold-value">50</span>
+        </label>
+        <input type="range" id="threshold" min="0" max="255" value="50">
+      </div>
     </div>
 
     <div class="level-meter">

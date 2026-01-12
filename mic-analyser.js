@@ -2,6 +2,10 @@ const button = document.getElementById("start");
 const statusDiv = document.getElementById("status");
 const thresholdSlider = document.getElementById("threshold");
 const thresholdValue = document.getElementById("threshold-value");
+const minFreqSlider = document.getElementById("minFreq");
+const minFreqValue = document.getElementById("minFreq-value");
+const maxFreqSlider = document.getElementById("maxFreq");
+const maxFreqValue = document.getElementById("maxFreq-value");
 const meterBar = document.getElementById("meter-bar");
 const thresholdLine = document.getElementById("threshold-line");
 const currentLevelSpan = document.getElementById("current-level");
@@ -9,11 +13,21 @@ const thresholdDisplaySpan = document.getElementById("threshold-display");
 
 let audioCtx, analyser, dataArray;
 
-// Load threshold from localStorage or use default
+// Load settings from localStorage or use defaults
 let threshold = localStorage.getItem('micThreshold') ? parseInt(localStorage.getItem('micThreshold')) : 50;
+let minFreq = localStorage.getItem('micMinFreq') ? parseInt(localStorage.getItem('micMinFreq')) : 400;
+let maxFreq = localStorage.getItem('micMaxFreq') ? parseInt(localStorage.getItem('micMaxFreq')) : 800;
+
+// Set initial slider values
 thresholdSlider.value = threshold;
 thresholdValue.textContent = threshold;
 thresholdDisplaySpan.textContent = threshold;
+
+minFreqSlider.value = minFreq;
+minFreqValue.textContent = minFreq;
+
+maxFreqSlider.value = maxFreq;
+maxFreqValue.textContent = maxFreq;
 
 // Update threshold line position
 function updateThresholdLine() {
@@ -29,6 +43,37 @@ thresholdSlider.oninput = () => {
   thresholdDisplaySpan.textContent = threshold;
   updateThresholdLine();
   localStorage.setItem('micThreshold', threshold);
+};
+
+// Update minFreq when slider changes
+minFreqSlider.oninput = () => {
+  minFreq = parseInt(minFreqSlider.value);
+  minFreqValue.textContent = minFreq;
+  localStorage.setItem('micMinFreq', minFreq);
+  
+  // Ensure minFreq doesn't exceed maxFreq
+  if (minFreq >= maxFreq) {
+    maxFreq = minFreq + 50;
+    maxFreqSlider.value = maxFreq;
+    maxFreqValue.textContent = maxFreq;
+    localStorage.setItem('micMaxFreq', maxFreq);
+  }
+};
+
+// Update maxFreq when slider changes
+maxFreqSlider.oninput = () => {
+  maxFreq = parseInt(maxFreqSlider.value);
+  maxFreqValue.textContent = maxFreq;
+  localStorage.setItem('micMaxFreq', maxFreq);
+  
+  // Ensure maxFreq doesn't go below minFreq
+  if (maxFreq <= minFreq) {
+    minFreq = maxFreq - 50;
+    if (minFreq < 50) minFreq = 50;
+    minFreqSlider.value = minFreq;
+    minFreqValue.textContent = minFreq;
+    localStorage.setItem('micMinFreq', minFreq);
+  }
 };
 
 button.onclick = async () => {
@@ -61,12 +106,9 @@ function draw() {
 
   analyser.getByteFrequencyData(dataArray);
 
-  // Calculate which bins correspond to 400-800Hz
+  // Calculate which bins correspond to the frequency range
   const sampleRate = audioCtx.sampleRate;
   const fftSize = analyser.fftSize;
-  
-  const minFreq = 400;
-  const maxFreq = 800;
   
   const minBin = Math.floor((minFreq * fftSize) / sampleRate);
   const maxBin = Math.ceil((maxFreq * fftSize) / sampleRate);
