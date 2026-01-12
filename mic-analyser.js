@@ -1,8 +1,16 @@
 const button = document.getElementById("start");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const statusDiv = document.getElementById("status");
+const thresholdSlider = document.getElementById("threshold");
+const thresholdValue = document.getElementById("threshold-value");
 
 let audioCtx, analyser, dataArray;
+let threshold = 50;
+
+// Update threshold display when slider changes
+thresholdSlider.oninput = () => {
+  threshold = parseInt(thresholdSlider.value);
+  thresholdValue.textContent = threshold;
+};
 
 button.onclick = async () => {
   audioCtx = new AudioContext();
@@ -23,6 +31,9 @@ button.onclick = async () => {
   // Wire graph
   source.connect(analyser);
 
+  button.disabled = true;
+  button.textContent = "Mic active";
+  
   draw();
 };
 
@@ -30,8 +41,6 @@ function draw() {
   requestAnimationFrame(draw);
 
   analyser.getByteFrequencyData(dataArray);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Calculate which bins correspond to 400-800Hz
   const sampleRate = audioCtx.sampleRate;
@@ -43,18 +52,23 @@ function draw() {
   const minBin = Math.floor((minFreq * fftSize) / sampleRate);
   const maxBin = Math.ceil((maxFreq * fftSize) / sampleRate);
   
-  // Only draw the bins in our frequency range
-  const binCount = maxBin - minBin;
-  const barWidth = canvas.width / binCount;
-
-  for (let i = 0; i < binCount; i++) {
-    const value = dataArray[minBin + i];
-    const barHeight = value;
-    ctx.fillRect(
-      i * barWidth,
-      canvas.height - barHeight,
-      barWidth,
-      barHeight
-    );
+  // Calculate average amplitude in the frequency range
+  let sum = 0;
+  let count = 0;
+  for (let i = minBin; i < maxBin; i++) {
+    sum += dataArray[i];
+    count++;
+  }
+  const avgAmplitude = count > 0 ? sum / count : 0;
+  
+  // Check if amplitude exceeds threshold
+  if (avgAmplitude > threshold) {
+    statusDiv.textContent = "Tone";
+    statusDiv.style.backgroundColor = "#90EE90";
+    statusDiv.style.color = "#006400";
+  } else {
+    statusDiv.textContent = "No tone";
+    statusDiv.style.backgroundColor = "#FFB6C1";
+    statusDiv.style.color = "#8B0000";
   }
 }

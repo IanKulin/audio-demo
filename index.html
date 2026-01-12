@@ -1,8 +1,47 @@
 <!doctype html>
 <html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      #status {
+        font-size: 48px;
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        text-align: center;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .threshold-control {
+        margin: 20px 0;
+      }
+      #threshold {
+        width: 300px;
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
   <body>
     <button id="start">Start mic</button>
-    <canvas id="canvas" width="600" height="200"></canvas>
+    
+    <div class="threshold-control">
+      <label for="threshold">
+        Threshold: <span id="threshold-value">50</span>
+      </label>
+      <input type="range" id="threshold" min="0" max="255" value="50">
+    </div>
+
+    <div id="status">Click "Start mic" to begin</div>
 
     <script src="mic-analyser.js"></script>
   </body>
