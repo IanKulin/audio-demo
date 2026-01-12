@@ -259,10 +259,12 @@ function draw() {
   }
   const avgAmplitude = count > 0 ? sum / count : 0;
   
-  // Update level meter
-  const percentage = (avgAmplitude / 255) * 100;
-  meterBar.style.width = percentage + '%';
-  currentLevelSpan.textContent = Math.round(avgAmplitude);
+  // Only update level meter if accordion is open (resource optimization)
+  if (controls.classList.contains('open')) {
+    const percentage = (avgAmplitude / 255) * 100;
+    meterBar.style.width = percentage + '%';
+    currentLevelSpan.textContent = Math.round(avgAmplitude);
+  }
   
   // Check if amplitude exceeds threshold
   const newState = avgAmplitude > threshold ? "tone" : "no-tone";
