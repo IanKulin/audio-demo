@@ -2,15 +2,19 @@ const button = document.getElementById("start");
 const statusDiv = document.getElementById("status");
 const thresholdSlider = document.getElementById("threshold");
 const thresholdValue = document.getElementById("threshold-value");
-const currentLevelSpan = document.getElementById("current-level");
 
 let audioCtx, analyser, dataArray;
-let threshold = 50;
+
+// Load threshold from localStorage or use default
+let threshold = localStorage.getItem('micThreshold') ? parseInt(localStorage.getItem('micThreshold')) : 50;
+thresholdSlider.value = threshold;
+thresholdValue.textContent = threshold;
 
 // Update threshold display when slider changes
 thresholdSlider.oninput = () => {
   threshold = parseInt(thresholdSlider.value);
   thresholdValue.textContent = threshold;
+  localStorage.setItem('micThreshold', threshold);
 };
 
 button.onclick = async () => {
@@ -61,9 +65,6 @@ function draw() {
     count++;
   }
   const avgAmplitude = count > 0 ? sum / count : 0;
-  
-  // Display current level
-  currentLevelSpan.textContent = avgAmplitude.toFixed(1);
   
   // Check if amplitude exceeds threshold
   if (avgAmplitude > threshold) {
