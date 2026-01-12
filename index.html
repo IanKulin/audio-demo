@@ -20,12 +20,40 @@
         align-items: center;
         justify-content: center;
       }
-      .controls {
+      .controls-accordion {
         margin: 20px 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .accordion-header {
+        background: #e0e0e0;
+        padding: 15px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+      }
+      .accordion-header:hover {
+        background: #d0d0d0;
+      }
+      .accordion-icon {
+        font-size: 14px;
+        transition: transform 0.3s ease;
+      }
+      .accordion-icon.open {
+        transform: rotate(180deg);
+      }
+      .controls {
         padding: 15px;
         background: #f9f9f9;
-        border-radius: 8px;
-        border: 1px solid #ddd;
+        display: none;
+        overflow: hidden;
+      }
+      .controls.open {
+        display: block;
       }
       .control-group {
         margin: 15px 0;
@@ -113,26 +141,33 @@
   <body>
     <button id="start">Start mic</button>
     
-    <div class="controls">
-      <div class="control-group">
-        <label for="minFreq">
-          Low Frequency Cutoff: <span id="minFreq-value">400</span> Hz
-        </label>
-        <input type="range" id="minFreq" min="50" max="2000" value="400" step="10">
+    <div class="controls-accordion">
+      <div class="accordion-header" id="accordion-header">
+        <span>Settings</span>
+        <span class="accordion-icon" id="accordion-icon">▼</span>
       </div>
       
-      <div class="control-group">
-        <label for="maxFreq">
-          High Frequency Cutoff: <span id="maxFreq-value">800</span> Hz
-        </label>
-        <input type="range" id="maxFreq" min="50" max="2000" value="800" step="10">
-      </div>
-      
-      <div class="control-group">
-        <label for="threshold">
-          Threshold: <span id="threshold-value">50</span>
-        </label>
-        <input type="range" id="threshold" min="0" max="255" value="50">
+      <div class="controls" id="controls">
+        <div class="control-group">
+          <label for="minFreq">
+            Low Frequency Cutoff: <span id="minFreq-value">400</span> Hz
+          </label>
+          <input type="range" id="minFreq" min="50" max="2000" value="400" step="10">
+        </div>
+        
+        <div class="control-group">
+          <label for="maxFreq">
+            High Frequency Cutoff: <span id="maxFreq-value">800</span> Hz
+          </label>
+          <input type="range" id="maxFreq" min="50" max="2000" value="800" step="10">
+        </div>
+        
+        <div class="control-group">
+          <label for="threshold">
+            Amplitude Threshold: <span id="threshold-value">50</span>
+          </label>
+          <input type="range" id="threshold" min="0" max="255" value="50">
+        </div>
       </div>
     </div>
 

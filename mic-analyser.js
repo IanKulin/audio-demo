@@ -10,12 +10,31 @@ const meterBar = document.getElementById("meter-bar");
 const thresholdLine = document.getElementById("threshold-line");
 const currentLevelSpan = document.getElementById("current-level");
 const thresholdDisplaySpan = document.getElementById("threshold-display");
+const accordionHeader = document.getElementById("accordion-header");
+const accordionIcon = document.getElementById("accordion-icon");
+const controls = document.getElementById("controls");
 
 let audioCtx, analyser, dataArray;
 let currentState = undefined; // undefined, "tone", or "no-tone"
 let currentStateStartTime = null;
 let stateHistory = []; // Array to store last 10 state periods
 const MAX_HISTORY = 10;
+
+// Accordion functionality
+function toggleAccordion() {
+  const isOpen = controls.classList.toggle('open');
+  accordionIcon.classList.toggle('open');
+  localStorage.setItem('accordionOpen', isOpen);
+}
+
+// Load accordion state from localStorage
+const accordionOpen = localStorage.getItem('accordionOpen') === 'true';
+if (accordionOpen) {
+  controls.classList.add('open');
+  accordionIcon.classList.add('open');
+}
+
+accordionHeader.addEventListener('click', toggleAccordion);
 
 // Load settings from localStorage or use defaults
 let threshold = localStorage.getItem('micThreshold') ? parseInt(localStorage.getItem('micThreshold')) : 50;
