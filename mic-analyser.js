@@ -115,10 +115,10 @@ function updateHistoryDisplay() {
   // Display history in reverse order (newest first)
   for (let i = stateHistory.length - 1; i >= 0; i--) {
     const entry = stateHistory[i];
-    const duration = ((entry.endTime - entry.startTime) / 1000).toFixed(2);
+    const duration = (entry.endTime - entry.startTime).toFixed(0);
     
     const li = document.createElement('li');
-    li.textContent = `${entry.state}: ${duration}s`;
+    li.textContent = `${entry.state}: ${duration} ms`;
     li.className = entry.state;
     historyList.appendChild(li);
   }
